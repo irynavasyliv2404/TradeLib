@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TradeLib.Models
 {
-    public enum TradeType
+    enum TradeType
     {
         Buy,
         Sell

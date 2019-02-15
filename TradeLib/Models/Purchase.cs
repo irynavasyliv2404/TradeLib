@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TradeLib.Models
 {
-    public class Purchase
+    class Purchase
     {
         public string OrderUserName { set; get; }
         public string MathingOrderUserName { set; get; }

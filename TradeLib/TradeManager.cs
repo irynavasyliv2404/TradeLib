@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using TradeLib.Models;
 
 namespace TradeLib
 {
     public class TradeManager
     {
-        private List<Order> _orders;
-        private List<Purchase> _purchases;
+        private readonly object _locker = new object();
 
-        private Func<IEnumerable<Order>, Order, Order> _orderMatchingFilter;
+        private readonly List<Order> _orders;
+        private readonly List<Purchase> _purchases;
+
+        private Func<Order, Order> _findOrderMatch;
 
         public TradeManager()
         {
@@ -21,8 +24,10 @@ namespace TradeLib
 
         public void Buy(string userName, double price)
         {
-            _orderMatchingFilter = BuyMatchFilter;
-            MatchOrders(new Order
+            if (price <= 0)
+                throw new Exception("Price has to be more than zero");
+            _findOrderMatch = FindSellerForBuyer;
+            ManagePurchase(new Order
             {
                 UserName = userName,
                 Price = price,
@@ -33,8 +38,10 @@ namespace TradeLib
 
         public void Sell(string userName, double price)
         {
-            _orderMatchingFilter = SellMatchFilter;
-            MatchOrders(new Order
+            if (price <= 0)
+                throw new Exception("Price has to be more than zero");
+            _findOrderMatch = FindBuyerForSeller;
+            ManagePurchase(new Order
             {
                 UserName = userName,
                 Price = price,
@@ -43,25 +50,34 @@ namespace TradeLib
             });
         }
 
-        private void MatchOrders(Order order)
+        public IEnumerable<string> GetAllPurchases()
         {
-            var matchOrder = _orderMatchingFilter(_orders, order);
-            if (matchOrder == null)
-            {
-                _orders.Add(order);
-                return;
-            }
-            _purchases.Add(new Purchase()
-            {
-                TradeType = order.TradeType,
-                Price = order.Price,
-                OrderUserName = order.UserName,
-                MathingOrderUserName = matchOrder.UserName
-            });
-            _orders.Remove(matchOrder);
+            return _purchases.Select(c => c.ToString());
         }
 
-        private Order BuyMatchFilter(IEnumerable<Order> _orders, Order order)
+        private void ManagePurchase(Order order)
+        {
+            lock (_locker)
+            {
+                var matchOrder = _findOrderMatch(order);
+                if (matchOrder == null)
+                {
+                    _orders.Add(order);
+                    return;
+                }
+                _purchases.Add(new Purchase()
+                {
+                    TradeType = order.TradeType,
+                    Price = order.Price,
+                    OrderUserName = order.UserName,
+                    MathingOrderUserName = matchOrder.UserName
+                });
+
+                _orders.Remove(matchOrder);
+            }
+        }
+
+        private Order FindSellerForBuyer(Order order)
         {
             var matchingOrders = _orders.Where(c => c.TradeType != order.TradeType && c.Price <= order.Price).ToList();
 
@@ -76,7 +92,7 @@ namespace TradeLib
             return resultMatch;
         }
 
-        private Order SellMatchFilter(IEnumerable<Order> _orders, Order order)
+        private Order FindBuyerForSeller(Order order)
         {
             var matchingOrders = _orders.Where(c => c.TradeType != order.TradeType && c.Price >= order.Price).ToList();
 
@@ -89,11 +105,6 @@ namespace TradeLib
                 .FirstOrDefault();
 
             return resultMatch;
-        }
-
-        public IEnumerable<string> GetAllPurchases()
-        {
-            return _purchases.Select(c=>c.ToString());
         }
     }
 }

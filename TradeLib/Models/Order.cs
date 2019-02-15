@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TradeLib.Models
 {
-    public class Order
+    class Order
     {
         public string UserName { set; get; }
         public double Price { set; get; }

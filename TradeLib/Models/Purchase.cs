@@ -17,9 +17,9 @@ namespace TradeLib.Models
             switch (this.TradeType)
             {
                 case TradeType.Buy:
-                    return $"{OrderUserName} bought a pumpkin from {MathingOrderUserName} for {Price} €";
+                    return $"{OrderUserName} bought a pumpkin from {MathingOrderUserName} for {Price}€";
                 case TradeType.Sell:
-                    return $"{OrderUserName} sold a pumpkin to {MathingOrderUserName} for {Price} €";
+                    return $"{OrderUserName} sold a pumpkin to {MathingOrderUserName} for {Price}€";
                 default:
                     throw new InvalidEnumArgumentException();
             }

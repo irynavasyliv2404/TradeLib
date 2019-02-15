@@ -1,4 +1,4 @@
-1. Add a parameter specifying the amount of pumpkins to buy or sell 
+### Add a parameter specifying the amount of pumpkins to buy or sell 
 
 1) add property "Amount" to Order model.
 2) find the price of one pumpkin that buyer/seller wants to buy/sell.
@@ -7,9 +7,9 @@
 5) the matching order cannot take part in trades anymore, because "An order can be matched only once".
 
 
-2. Add possibility to specify expiration time for the order.
+### Add possibility to specify expiration time for the order.
 
 1) add condition when matching the order, that it is not expired. 
 2) Cleanup the stored orders. There are two ways to do it:
-	● every time when new order comes, look for expired orders and delete them.
-	● use cron to set the removing order method be called in time the order is expired.
+* every time when new order comes, look for expired orders and delete them.
+* use cron to set the removing order method be called in time the order is expired.

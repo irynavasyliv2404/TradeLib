@@ -59,8 +59,8 @@ namespace TradeLib
         {
             lock (_locker)
             {
-                var matchOrder = _findOrderMatch(order);
-                if (matchOrder == null)
+                var matchingOrder = _findOrderMatch(order);
+                if (matchingOrder == null)
                 {
                     _orders.Add(order);
                     return;
@@ -70,10 +70,10 @@ namespace TradeLib
                     TradeType = order.TradeType,
                     Price = order.Price,
                     OrderUserName = order.UserName,
-                    MathingOrderUserName = matchOrder.UserName
+                    MathingOrderUserName = matchingOrder.UserName
                 });
 
-                _orders.Remove(matchOrder);
+                _orders.Remove(matchingOrder);
             }
         }
 

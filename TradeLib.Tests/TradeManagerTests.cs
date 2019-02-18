@@ -28,6 +28,35 @@ namespace TradeLib.Tests
         }
 
         [TestMethod]
+        public void Buy_ThrowException_WhenNameIsNull()
+        {
+            Action action = () => _tradeManager.Buy(null, -1);
+            Assert.ThrowsException<Exception>(action, "Name cannot be empty");
+        }
+
+        [TestMethod]
+        public void Sell_ThrowException_WhenNameIsNull()
+        {
+            Action action = () => _tradeManager.Sell(null, -1);
+            Assert.ThrowsException<Exception>(action, "Name cannot be empty");
+        }
+
+        [TestMethod]
+        public void Buy_ThrowException_WhenNameIsEmpty()
+        {
+            Action action = () => _tradeManager.Buy("", -1);
+            Assert.ThrowsException<Exception>(action, "Name cannot be empty");
+        }
+
+        [TestMethod]
+        public void Sell_ThrowException_WhenNameIsEmpty()
+        {
+            Action action = () => _tradeManager.Sell("", -1);
+            Assert.ThrowsException<Exception>(action, "Name cannot be empty");
+        }
+
+
+        [TestMethod]
         public void GetAllPurchases()
         {
             var expectedPurchases = new List<string>()

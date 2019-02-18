@@ -11,7 +11,7 @@ namespace TradeLib.Tests
     [TestClass]
     public class TradeManagerTests
     {
-        private TradeManager _tradeManager = new TradeManager();
+        private readonly TradeManager _tradeManager = new TradeManager();
 
         [TestMethod]
         public void Buy_ThrowException_WhenPriceIsNotPositive()

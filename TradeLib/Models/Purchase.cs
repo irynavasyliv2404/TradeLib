@@ -8,7 +8,7 @@ namespace TradeLib.Models
     class Purchase
     {
         public string OrderUserName { set; get; }
-        public string MathingOrderUserName { set; get; }
+        public string MatchingOrderUserName { set; get; }
         public double Price { set; get; }
         public TradeType TradeType { set; get; }
 
@@ -17,9 +17,9 @@ namespace TradeLib.Models
             switch (this.TradeType)
             {
                 case TradeType.Buy:
-                    return $"{OrderUserName} bought a pumpkin from {MathingOrderUserName} for {Price}€";
+                    return $"{OrderUserName} bought a pumpkin from {MatchingOrderUserName} for {Price}€";
                 case TradeType.Sell:
-                    return $"{OrderUserName} sold a pumpkin to {MathingOrderUserName} for {Price}€";
+                    return $"{OrderUserName} sold a pumpkin to {MatchingOrderUserName} for {Price}€";
                 default:
                     throw new InvalidEnumArgumentException();
             }

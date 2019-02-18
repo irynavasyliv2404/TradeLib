@@ -70,7 +70,7 @@ namespace TradeLib
                     TradeType = order.TradeType,
                     Price = order.Price,
                     OrderUserName = order.UserName,
-                    MathingOrderUserName = matchingOrder.UserName
+                    MatchingOrderUserName = matchingOrder.UserName
                 });
 
                 _orders.Remove(matchingOrder);

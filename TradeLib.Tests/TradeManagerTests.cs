@@ -50,28 +50,33 @@ namespace TradeLib.Tests
         }
 
         [TestMethod]
-        public void GetAllPurchases_Multithreading()
+        public void GetAllPurchases_MultiThreading()
         {
             var expectedPurchases = new List<string>()
             {
-                "C sold a pumpkin to B for 9€",
-                "D sold a pumpkin to A for 8€",
+                "D sold a pumpkin to B for 9€",
+                "E sold a pumpkin to C for 8€"
             };
 
             _tradeManager.Buy("A", 10);
             _tradeManager.Buy("B", 11);
 
-            Thread thread1 = new Thread(() => _tradeManager.Sell("C", 9));
-            Thread thread2 = new Thread(() => _tradeManager.Sell("D", 8));
-
+            Thread thread1 = new Thread(() => _tradeManager.Sell("D", 9));
+            Thread thread2 = new Thread(() => _tradeManager.Buy("C", 12));
+            Thread thread3 = new Thread(() => _tradeManager.Sell("E", 8));
+            
             thread1.Start();
+            Thread.Sleep(10);
             thread2.Start();
+            Thread.Sleep(10);
+            thread3.Start();
 
             thread1.Join();
             thread2.Join();
+            thread3.Join();
 
             var actualPurchases = _tradeManager.GetAllPurchases().ToList();
-            CollectionAssert.AreEqual(expectedPurchases, actualPurchases);
+            CollectionAssert.AreEquivalent(expectedPurchases, actualPurchases);
         }
     }
 }

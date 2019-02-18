@@ -14,8 +14,6 @@ namespace TradeLib
         private readonly List<Order> _orders;
         private readonly List<Purchase> _purchases;
 
-        private Func<Order, Order> _findOrderMatch;
-
         public TradeManager()
         {
             _orders = new List<Order>();
@@ -26,28 +24,28 @@ namespace TradeLib
         {
             if (price <= 0)
                 throw new Exception("Price has to be more than zero");
-            _findOrderMatch = FindSellerForBuyer;
+
             ManagePurchase(new Order
             {
                 UserName = userName,
                 Price = price,
                 TradeType = TradeType.Buy,
-                OrderTime = DateTime.Now
-            });
+                OrderTime = DateTime.UtcNow
+            }, FindSellerForBuyer);
         }
 
         public void Sell(string userName, double price)
         {
             if (price <= 0)
                 throw new Exception("Price has to be more than zero");
-            _findOrderMatch = FindBuyerForSeller;
+
             ManagePurchase(new Order
             {
                 UserName = userName,
                 Price = price,
                 TradeType = TradeType.Sell,
-                OrderTime = DateTime.Now
-            });
+                OrderTime = DateTime.UtcNow
+            }, FindBuyerForSeller);
         }
 
         public IEnumerable<string> GetAllPurchases()
@@ -55,11 +53,11 @@ namespace TradeLib
             return _purchases.Select(c => c.ToString());
         }
 
-        private void ManagePurchase(Order order)
+        private void ManagePurchase(Order order, Func<Order, Order> findOrderMatch)
         {
             lock (_locker)
             {
-                var matchingOrder = _findOrderMatch(order);
+                var matchingOrder = findOrderMatch(order);
                 if (matchingOrder == null)
                 {
                     _orders.Add(order);

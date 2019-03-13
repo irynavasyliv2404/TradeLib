@@ -11,41 +11,21 @@ namespace TradeLib
     {
         private readonly object _locker = new object();
 
-        private readonly List<Order> _orders;
-        private readonly List<Purchase> _purchases;
-
-        public TradeManager()
-        {
-            _orders = new List<Order>();
-            _purchases = new List<Purchase>();
-        }
+        private readonly List<Order> _orders = new List<Order>();
+        private readonly List<Purchase> _purchases = new List<Purchase>();
 
         public void Buy(string userName, double price)
         {
-            if (price <= 0)
-                throw new Exception("Price has to be more than zero");
-
-            ManagePurchase(new Order
-            {
-                UserName = userName,
-                Price = price,
-                TradeType = TradeType.Buy,
-                OrderTime = DateTime.UtcNow
-            }, FindSellerForBuyer);
+            var order = ValidateAndCreateOrder(userName, price);
+            order.TradeType = TradeType.Buy;
+            ManagePurchase(order, GetMatchingSellersForBuyer);
         }
 
         public void Sell(string userName, double price)
         {
-            if (price <= 0)
-                throw new Exception("Price has to be more than zero");
-
-            ManagePurchase(new Order
-            {
-                UserName = userName,
-                Price = price,
-                TradeType = TradeType.Sell,
-                OrderTime = DateTime.UtcNow
-            }, FindBuyerForSeller);
+            var order = ValidateAndCreateOrder(userName, price);
+            order.TradeType = TradeType.Sell;
+            ManagePurchase(order, GetMatchingBuyersForSeller);
         }
 
         public IEnumerable<string> GetAllPurchases()
@@ -53,16 +33,36 @@ namespace TradeLib
             return _purchases.Select(c => c.ToString());
         }
 
-        private void ManagePurchase(Order order, Func<Order, Order> findOrderMatch)
+        private Order ValidateAndCreateOrder(string userName, double price)
+        {
+            if (price <= 0)
+                throw new Exception("Price has to be more than zero");
+
+            if(String.IsNullOrEmpty(userName))
+                throw new Exception("Name cannot be empty");
+
+            return new Order()
+            {
+                UserName = userName,
+                Price = price,
+                OrderTime = DateTime.UtcNow
+            };
+        }
+
+        private void ManagePurchase(Order order, Func<IEnumerable<Order>, Order, IOrderedEnumerable<Order>> findOrderMatch)
         {
             lock (_locker)
             {
-                var matchingOrder = findOrderMatch(order);
+                var matchingOrder = findOrderMatch(_orders.Where(c=>c.TradeType != order.TradeType), order)
+                    .ThenBy(c=>c.OrderTime)
+                    .FirstOrDefault();
+
                 if (matchingOrder == null)
                 {
                     _orders.Add(order);
                     return;
                 }
+
                 _purchases.Add(new Purchase()
                 {
                     TradeType = order.TradeType,
@@ -75,34 +75,18 @@ namespace TradeLib
             }
         }
 
-        private Order FindSellerForBuyer(Order order)
+        private IOrderedEnumerable<Order> GetMatchingSellersForBuyer(IEnumerable<Order> sellers, Order order)
         {
-            var matchingOrders = _orders.Where(c => c.TradeType != order.TradeType && c.Price <= order.Price).ToList();
-
-            if (!matchingOrders.Any())
-                return null;
-
-            var resultMatch = matchingOrders
-                .OrderBy(c => c.Price)
-                .ThenBy(c => c.OrderTime)
-                .FirstOrDefault();
-
-            return resultMatch;
+            return sellers
+                .Where(c => c.Price <= order.Price)
+                .OrderBy(c => c.Price);
         }
 
-        private Order FindBuyerForSeller(Order order)
+        private IOrderedEnumerable<Order> GetMatchingBuyersForSeller(IEnumerable<Order> buyers, Order order)
         {
-            var matchingOrders = _orders.Where(c => c.TradeType != order.TradeType && c.Price >= order.Price).ToList();
-
-            if (!matchingOrders.Any())
-                return null;
-
-            var resultMatch = matchingOrders
-                .OrderByDescending(c => c.Price)
-                .ThenBy(c => c.OrderTime)
-                .FirstOrDefault();
-
-            return resultMatch;
+            return buyers
+                .Where(c => c.Price >= order.Price)
+                .OrderByDescending(c => c.Price);
         }
     }
 }

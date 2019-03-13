@@ -4,4 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Empeek.Styleguide.Dotnet" Version="0.0.118" />
+    <PackageReference Include="NuGet.CommandLine" Version="4.9.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -file ../pre-build-script.ps1" />
+  </Target>
+
 </Project>

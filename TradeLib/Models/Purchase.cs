@@ -5,12 +5,15 @@ using System.Text;
 
 namespace TradeLib.Models
 {
-    class Purchase
+    public class Purchase
     {
         public string OrderUserName { set; get; }
+
         public string MatchingOrderUserName { set; get; }
-        public double Price { set; get; }
-        public TradeType TradeType { set; get; }
+
+        public double Price { get; set; }
+
+        public TradeType TradeType { get; set; }
 
         public override string ToString()
         {

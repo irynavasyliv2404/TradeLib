@@ -90,10 +90,10 @@ namespace TradeLib.Tests
             _tradeManager.Buy("A", 10);
             _tradeManager.Buy("B", 11);
 
-            Thread thread1 = new Thread(() => _tradeManager.Sell("D", 9));
-            Thread thread2 = new Thread(() => _tradeManager.Buy("C", 12));
-            Thread thread3 = new Thread(() => _tradeManager.Sell("E", 8));
-            
+            var thread1 = new Thread(() => _tradeManager.Sell("D", 9));
+            var thread2 = new Thread(() => _tradeManager.Buy("C", 12));
+            var thread3 = new Thread(() => _tradeManager.Sell("E", 8));
+
             thread1.Start();
             Thread.Sleep(10);
             thread2.Start();

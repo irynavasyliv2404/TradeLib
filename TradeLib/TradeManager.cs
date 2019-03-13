@@ -10,7 +10,6 @@ namespace TradeLib
     public class TradeManager
     {
         private readonly object _locker = new object();
-
         private readonly List<Order> _orders = new List<Order>();
         private readonly List<Purchase> _purchases = new List<Purchase>();
 
@@ -36,10 +35,14 @@ namespace TradeLib
         private Order ValidateAndCreateOrder(string userName, double price)
         {
             if (price <= 0)
+            {
                 throw new Exception("Price has to be more than zero");
+            }
 
-            if(String.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(userName))
+            {
                 throw new Exception("Name cannot be empty");
+            }
 
             return new Order()
             {
@@ -53,8 +56,8 @@ namespace TradeLib
         {
             lock (_locker)
             {
-                var matchingOrder = findOrderMatch(_orders.Where(c=>c.TradeType != order.TradeType), order)
-                    .ThenBy(c=>c.OrderTime)
+                var matchingOrder = findOrderMatch(_orders.Where(c => c.TradeType != order.TradeType), order)
+                    .ThenBy(c => c.OrderTime)
                     .FirstOrDefault();
 
                 if (matchingOrder == null)
@@ -70,6 +73,8 @@ namespace TradeLib
                     OrderUserName = order.UserName,
                     MatchingOrderUserName = matchingOrder.UserName
                 });
+
+                var a = (long)1;
 
                 _orders.Remove(matchingOrder);
             }
